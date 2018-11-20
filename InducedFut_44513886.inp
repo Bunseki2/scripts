@@ -1,0 +1,72 @@
+InducedFit_44513886.inp
+
+#  Multiple input structures can be specified by adding additional
+#  INPUT_FILE lines or including multiple structures in a single
+#  file.
+#
+#  If beginning with an existing Pose Viewer file, simply specify
+#  it as the INPUT_FILE (making sure the name ends in "_pv.mae"
+#  or "_pv.maegz") and ensure that the INITIAL_DOCKING stage
+#  is commented out.  The ligand used in producing the Pose Viewer
+#  file must also be provided to the GLIDE_DOCKING2 stage,
+#  using the LIGAND_FILE keyword.
+
+INPUT_FILE  InducedFit_44513886_rec.mae
+
+# Prime Loop Prediction
+#  Perform a loop prediction on the specified loop, including
+#  side chains within the given distance.  Only return
+#  structures within the specified energy range from the
+#  lowest energy prediction, up to the maximum number of
+#  conformations given.
+#
+#  Note: This stage is disabled by default.  Uncomment the
+#   lines below and edit the fields appropriately to enable it.
+#STAGE PRIME_LOOP
+#  START_RESIDUE A:11
+#  END_RESIDUE A:16
+#  RES_SPHERE 7.5
+#  MAX_ENERGY_GAP 30.0
+#  MAX_STRUCTURES 5
+#  USE_MEMBRANE no
+
+STAGE VDW_SCALING
+  BINDING_SITE ligand A:1101
+
+STAGE PREDICT_FLEXIBILITY
+  BINDING_SITE ligand A:1101
+
+STAGE INITIAL_DOCKING
+  BINDING_SITE ligand A:1101
+  INNERBOX 10.0
+  OUTERBOX 46
+  LIGAND_FILE InducedFit_44513886.maegz
+  LIGANDS_TO_DOCK all
+  VARIANTS_TO_RUN A,B,C,D,E,F,G
+  DOCKING_RINGCONFCUT 2.5
+  DOCKING_AMIDE_MODE penal
+
+STAGE COMPILE_RESIDUE_LIST
+  DISTANCE_CUTOFF 5.0
+
+STAGE PRIME_REFINEMENT
+  NUMBER_OF_PASSES  1
+  USE_MEMBRANE no
+  OPLS_VERSION OPLS_2005
+
+STAGE GLIDE_DOCKING2
+  BINDING_SITE ligand Z:999
+  INNERBOX 5.0
+  OUTERBOX auto
+  LIGAND_FILE  InducedFit_44513886.maegz
+  LIGANDS_TO_DOCK existing
+  DOCKING_PRECISION SP
+  DOCKING_RINGCONFCUT 2.5
+  DOCKING_AMIDE_MODE penal
+
+STAGE SCORING
+  SCORE_NAME  r_psp_IFDScore
+  TERM 1.000,r_psp_Prime_Energy,1
+  TERM 9.057,r_i_glide_gscore,0
+  TERM 1.428,r_i_glide_ecoul,0
+  REPORT_FILE report.csv
