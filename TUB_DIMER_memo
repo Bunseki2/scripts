@@ -1,0 +1,17 @@
+ qsub -W depend=afterok:5686710.biobos -v np=16 -l nodes=8:ipath namd_ipath_npt_restart.sh
+run_dependent.sh
+
+qsub -v np=64 -l nodes=8:ib namd_ib_npt_restart_8.sh
+qsub  -W depend=afterok:5728324.biobos -v np=64 -l nodes=8:ib namd_ib_npt_restart_9.sh
+
+
+
+qsub  -v np=64 -l nodes=8:ib  namd_ib_npt_restart_22.sh  &>biobos_nu
+
+
+m=`cat biobos_num`
+qsub  -W depend=afterok:$m -v np=64 -l nodes=8:ib namd_ib_npt_restart_$j.sh &>biobos_num
+
+
+ /usr/local/lib/vmd-1.9.1/plugins/LINUXAMD64/bin/catdcd4.0/catdcd -o GDP-tubulinD_NPT_2.pdb -otype pdb -s GDP-tubulinD_Wb_ion.psf -stype psf GDP-tubulinD_
+NPT_2.dcd
